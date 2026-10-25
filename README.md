@@ -1,5 +1,34 @@
 # Base-2520-instruction---Floating-point-replacement
 
+code for the module in verilog [here](https://github.com/sighthough/Base-2520-instruction---Floating-point-replacement/blob/main/base2520instructionverilog.txt)
+readme for code [here](https://github.com/sighthough/Base-2520-instruction---Floating-point-replacement/blob/main/code%20readme%20for%20base2520.txt)
+
+
+
+The main idea behind this one is using a base 2520 system instead of a 10 or 2 so that we can have whole numbers instead of fractions,
+that way enables us to be able to divide numbers in halfs or quarters or more so that they have a tiny footprint when calculating while beeing 
+very very big .
+
+by making this module for the computers we should hopefully get speed boosts and much higher number representations than standard fpu architectures
+
+
+
+
+*Co-authored by [sighthough](https://youtu.be/UtPiUGwu-0Q) and [Googles Gemini](https://www.youtube.com/shorts/R3Qo4rBgrD8).*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 A Base-2520 hardware processor is a custom silicon arithmetic unit that executes exact, remainder-free fractional calculations using pure integer logic to eliminate floating-point drift at maximum speed.
 
@@ -37,70 +66,4 @@ like an FPGA (Field Programmable Gate Array) or sent to a silicon foundry to be 
 The following production-ready, synthesizable Verilog module implements a Base-2520 Arithmetic Processing Unit (APU). 
 
 It features dedicated hardware pipelines for addition, subtraction, multiplication with built-in Base-2520 rescaling, and remainder-free scaling/division.
-
-Code : 
-''text
-
-`timescale 1ns / 1ps
-
-module Base2520_ALU (
-    input wire clk,
-    input wire rst_n,
-    input wire [1:0] op_mode,      // 00: Add, 01: Sub, 10: Mul (with 2520 norm), 11: Divide/Scale
-    input wire signed [63:0] a,    // 64-bit signed input A (already scaled by 2520)
-    input wire signed [63:0] b,    // 64-bit signed input B (already scaled by 2520 or divisor)
-    output reg signed [63:0] result,
-    output reg overflow_flag
-);
-
-    // Base-2520 Scale Constant
-    localparam signed [63:0] SCALE_FACTOR = 64'd2520;
-
-    // Internal pipeline registers for high-frequency clock performance
-    reg signed [127:0] mult_wide;  // 128-bit accumulator to prevent multiplication overflow
-
-    always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
-            result <= 64'sd0;
-            overflow_flag <= 1'b0;
-        end else begin
-            overflow_flag <= 1'b0;
-            case (op_mode)
-                // 00: Addition (No extra scaling needed if both are in base 2520)
-                2'b00: begin
-                    result <= a + b;
-                end
-
-                // 01: Subtraction
-                2'b01: begin
-                    result <= a - b;
-                end
-
-                // 10: Multiplication with Base-2520 Rescaling: (A * B) / 2520
-                // Multiplying two 64-bit numbers requires a 128-bit register to hold the raw product.
-                2'b10: begin
-                    mult_wide = a * b;
-                    // Normalize back down to maintain the 2520 equilibrium
-                    result <= mult_wide / SCALE_FACTOR; 
-                end
-
-                // 11: Division / Factor Scaling (e.g., halving, quartering, or dividing by clean factors)
-                2'b11: begin
-                    if (b != 64'sd0) begin
-                        result <= a / b; // Clean integer division
-                    end else begin
-                        result <= 64'sd0;
-                        overflow_flag <= 1'b1; // Division by zero protection
-                    end
-                end
-
-                default: begin
-                    result <= 64'sd0;
-                end
-            endcase
-        end
-    end
-
-endmodule
-
 
