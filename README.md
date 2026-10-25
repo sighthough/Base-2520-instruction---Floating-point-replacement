@@ -72,7 +72,3 @@ Furthermore, because integer units take up fewer physical transistors on a chip 
 
 chip designers could pack 30% to 50% more calculation cores onto the exact same piece of silicon, multiplying your throughput across large arrays.
 
-The following production-ready, synthesizable Verilog module implements a Base-2520 Arithmetic Processing Unit (APU). 
-
-It features dedicated hardware pipelines for addition, subtraction, multiplication with built-in Base-2520 rescaling, and remainder-free scaling/division.
-
